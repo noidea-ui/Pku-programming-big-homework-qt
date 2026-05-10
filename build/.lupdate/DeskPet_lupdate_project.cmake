@@ -1,0 +1,11 @@
+set(lupdate_project_file "D:/DeskPet/DeskPet/CMakeLists.txt")
+set(lupdate_translations "D:/DeskPet/DeskPet/DeskPet_zh_CN.ts")
+set(lupdate_include_paths "")
+set(lupdate_sources "")
+set(lupdate_subproject_count 1)
+
+set(lupdate_subproject1_source_dir "D:/DeskPet/DeskPet")
+set(lupdate_subproject1_include_paths "D:/DeskPet/build/DeskPet_autogen/include;D:/Qt/6.7.3/mingw_64/include/QtCore;D:/Qt/6.7.3/mingw_64/include;D:/Qt/6.7.3/mingw_64/mkspecs/win32-g++;D:/Qt/6.7.3/mingw_64/include;D:/Qt/6.7.3/mingw_64/include/QtWidgets;D:/Qt/6.7.3/mingw_64/include;D:/Qt/6.7.3/mingw_64/include/QtGui;D:/Qt/6.7.3/mingw_64/include")
+set(lupdate_subproject1_sources "D:/DeskPet/build/DeskPet_autogen/mocs_compilation.cpp;main.cpp;PetWindow.h;PetWindow.cpp;animationmanager.h;animationmanager.cpp;petcontroller.h;petcontroller.cpp;traymenumanager.h;traymenumanager.cpp;res.qrc;D:/DeskPet/build/.qt/rcc/qrc_DeskPet_translations.cpp;D:/DeskPet/build/DeskPet_autogen/timestamp;D:/DeskPet/build/DeskPet_autogen/EWIEGA46WW/qrc_res.cpp;D:/DeskPet/build/.qt/rcc/qrc_DeskPet_translations.cpp.rule;D:/DeskPet/build/DeskPet_autogen/timestamp.rule;D:/DeskPet/build/DeskPet_autogen/EWIEGA46WW/qrc_res.cpp.rule;D:/DeskPet/build/DeskPet_zh_CN.qm.rule")
+set(lupdate_subproject1_excluded "")
+set(lupdate_subproject1_autogen_dir "D:/DeskPet/build/DeskPet_autogen")

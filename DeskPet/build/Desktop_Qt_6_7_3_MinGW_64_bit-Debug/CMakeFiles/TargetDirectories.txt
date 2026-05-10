@@ -1,0 +1,14 @@
+D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/DeskPet.dir
+D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/DeskPet_lupdate.dir
+D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/update_translations.dir
+D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/DeskPet_lrelease.dir
+D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/release_translations.dir
+D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/DeskPet_other_files.dir
+D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
+D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
+D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/list_install_components.dir
+D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/install.dir
+D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/install/local.dir
+D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
+D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/DeskPet_autogen_timestamp_deps.dir
+D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/DeskPet_autogen.dir

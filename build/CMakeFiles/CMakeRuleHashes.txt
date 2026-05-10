@@ -1,0 +1,8 @@
+# Hashes of file build rules.
+f9f7757aaabb33ba21f0a6908e4938f7 .qt/rcc/qrc_DeskPet_translations.cpp
+4aff7223c83c50df7a23d266fbbd3061 CMakeFiles/DeskPet_autogen
+4aff7223c83c50df7a23d266fbbd3061 CMakeFiles/DeskPet_lrelease
+2cd4331d3b50643493e7d5c071e25320 CMakeFiles/DeskPet_lupdate
+49b072cf48d662b8a5ab235f4b70a33a DeskPet_autogen/EWIEGA46WW/qrc_res.cpp
+9849ddff8dc42359460f3167ba3a485a DeskPet_autogen/timestamp
+21278479adec186c1e263ce4639883a5 DeskPet_zh_CN.qm

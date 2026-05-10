@@ -1,0 +1,14 @@
+D:/DeskPet/build/CMakeFiles/DeskPet.dir
+D:/DeskPet/build/CMakeFiles/DeskPet_lupdate.dir
+D:/DeskPet/build/CMakeFiles/update_translations.dir
+D:/DeskPet/build/CMakeFiles/DeskPet_lrelease.dir
+D:/DeskPet/build/CMakeFiles/release_translations.dir
+D:/DeskPet/build/CMakeFiles/DeskPet_other_files.dir
+D:/DeskPet/build/CMakeFiles/edit_cache.dir
+D:/DeskPet/build/CMakeFiles/rebuild_cache.dir
+D:/DeskPet/build/CMakeFiles/list_install_components.dir
+D:/DeskPet/build/CMakeFiles/install.dir
+D:/DeskPet/build/CMakeFiles/install/local.dir
+D:/DeskPet/build/CMakeFiles/install/strip.dir
+D:/DeskPet/build/CMakeFiles/DeskPet_autogen_timestamp_deps.dir
+D:/DeskPet/build/CMakeFiles/DeskPet_autogen.dir
