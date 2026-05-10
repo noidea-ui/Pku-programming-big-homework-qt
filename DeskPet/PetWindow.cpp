@@ -1,6 +1,9 @@
 #include "petwindow.h"
 #include <QPainter>
 #include <QApplication>
+#include <QGuiApplication>
+#include <QScreen>
+#include <QDebug>
 
 PetWindow::PetWindow(QWidget *parent)
     : QWidget(parent),
@@ -12,15 +15,26 @@ PetWindow::PetWindow(QWidget *parent)
     // 【核心属性】：设置窗口背景完全透明
     setAttribute(Qt::WA_TranslucentBackground);
 
-    // 初始化窗口大小(与你的单帧素材大小一致)
-    resize(180, 180);
-
     // 实例化控制器
     m_controller = new PetController(this);
+    
+    // 获取加载的图片大小来设置窗口大小
+    QPixmap firstFrame = m_controller->getCurrentFrame();
+    if(!firstFrame.isNull()){
+        qDebug() << "Setting window size to image size:" << firstFrame.size();
+        resize(firstFrame.size());
+    } else {
+        qDebug() << "First frame is null, using default size 180x180";
+        resize(180, 180);
+    }
+    
     connect(m_controller, &PetController::frameUpdated, this, &PetWindow::onFrameUpdated);
+    connect(m_controller, &PetController::positionChanged, this, &PetWindow::setWindowPosition);
 
     // 实例化托盘管理器
     m_trayManager = new TrayMenuManager(this);
+    
+    qDebug() << "PetWindow initialized, size:" << size();
 }
 
 PetWindow::~PetWindow()
@@ -30,6 +44,13 @@ PetWindow::~PetWindow()
 void PetWindow::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
+    static bool firstPaint = true;
+    if(firstPaint){
+        firstPaint = false;
+        qDebug() << "PetWindow paintEvent called, window size:" << size() 
+                 << "window pos:" << pos();
+    }
+    
     QPainter painter(this);
 
     // 开启抗锯齿
@@ -40,9 +61,11 @@ void PetWindow::paintEvent(QPaintEvent *event)
 
     if (!currentFrame.isNull()) {
         // 如果成功获取到了图片，就绘制图片
+        qDebug() << "Drawing image, size:" << currentFrame.size();
         painter.drawPixmap(rect(), currentFrame);
     } else {
         // 【调试期占位符】：如果没有图片加载成功，画一个黄色的圆表示小狮子
+        qDebug() << "Image is null, drawing placeholder";
         painter.setBrush(QColor(255, 200, 0, 200)); // 半透明的黄色
         painter.setPen(Qt::NoPen);
         painter.drawEllipse(rect());
@@ -104,4 +127,27 @@ void PetWindow::onFrameUpdated()
 {
     // 收到控制器发出的刷新信号后，触发 paintEvent 重绘
     update();
+}
+
+void PetWindow::setWindowPosition(const QPoint &pos)
+{
+    if(m_isDragging) return; // 用户拖拽时不要打断
+
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if(!screen) return;
+    QRect geo = screen->availableGeometry();
+
+    int x = pos.x();
+    int y = pos.y();
+    int maxX = geo.right() - width();
+    int maxY = geo.bottom() - height();
+    int minX = geo.left();
+    int minY = geo.top();
+
+    if(x < minX) x = minX;
+    if(y < minY) y = minY;
+    if(x > maxX) x = maxX;
+    if(y > maxY) y = maxY;
+
+    move(x,y);
 }

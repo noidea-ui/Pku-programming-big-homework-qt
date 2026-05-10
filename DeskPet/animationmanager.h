@@ -9,10 +9,8 @@
 enum class PetState{
     IDLE,
     DRAGGED,
-    SLEEPING,
-    WORKING,
-    CELEBRATING,
-    SAD
+    WALKING,
+    SLEEPING
 };
 
 class AnimationManager

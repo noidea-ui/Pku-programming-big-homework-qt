@@ -6,48 +6,35 @@ AnimationManager::AnimationManager() {
 }
 
 void AnimationManager::loadLionSheet(const QString&filePath){
-    if(!m_lionSheet.load(filePath)){
-        qWarning()<<"Failed to load lion sheet from: "<<filePath;
+    bool loaded = m_lionSheet.load(filePath);
+    if(loaded){
+        qDebug() << "Successfully loaded lion sheet:" << filePath 
+                 << "Size:" << m_lionSheet.size();
+    } else {
+        qWarning() << "Failed to load lion sheet from:" << filePath;
     }
 }
 
 void AnimationManager::registerAnimations(){
-
-    //IDLE 待机状态，先完成这个然后再考虑其它的东西
-    QList<QRect> idleFrames;
-    idleFrames.append(QRect(0,0,100,100));
-    idleFrames.append(QRect(100,0,100,100));
-    m_animationFrames.insert(PetState::IDLE,idleFrames);
-
-    //DEAGGED 被拖拽的状态
-    QList<QRect>dragFrames;
-    dragFrames.append(QRect(0,100,100,100));
-    m_animationFrames.insert(PetState::DRAGGED,dragFrames);
-
-    //SLEEPING 睡觉状态
-    QList<QRect> sleepFrames;
-    sleepFrames.append(QRect(400,300,100,100));
-    sleepFrames.append(QRect(500,300,100,100));
-    m_animationFrames.insert(PetState::SLEEPING,sleepFrames);
-
-    //剩下的先暂时不做了，等到其它的做好了之后再进行完成
-
+    // 暂时跳过注册，改为在 getFrame 时动态返回整张图片
+    // 这样可以兼容后续的多帧动画
 }
 
-QPixmap AnimationManager::getFrame(PetState state,int frameIndex){
-    if(m_lionSheet.isNull()||!m_animationFrames.contains(state))  {
+QPixmap AnimationManager::getFrame(PetState /*state*/, int /*frameIndex*/){
+    // 直接返回整张图片，不处理帧切片
+    // 帧切换由调用者在 PetController 中处理（改变 m_currentFrameIndex）
+    if(m_lionSheet.isNull()){
+        qDebug() << "Lion sheet is null in getFrame()";
         return QPixmap();
     }
-
+    qDebug() << "Returning lion image, size:" << m_lionSheet.size();
     return m_lionSheet;
-
 }
 
-int AnimationManager::getFrameCount(PetState state) const{
-    if(m_animationFrames.contains(state)){
-        return m_animationFrames.value(state).size();
-    }
-    return 0;
+int AnimationManager::getFrameCount(PetState /*state*/) const{
+    // 返回2表示两帧（虽然实际上只返回一张图片）
+    // 这样 frameIndex % 2 可以在 0 和 1 间循环
+    return m_lionSheet.isNull() ? 0 : 2;
 }
 
 

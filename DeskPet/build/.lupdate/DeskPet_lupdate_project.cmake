@@ -1,0 +1,11 @@
+set(lupdate_project_file "E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/CMakeLists.txt")
+set(lupdate_translations "E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/DeskPet_zh_CN.ts")
+set(lupdate_include_paths "")
+set(lupdate_sources "")
+set(lupdate_subproject_count 1)
+
+set(lupdate_subproject1_source_dir "E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet")
+set(lupdate_subproject1_include_paths "E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/build/DeskPet_autogen/include;C:/Qt/6.7.3/mingw_64/include/QtCore;C:/Qt/6.7.3/mingw_64/include;C:/Qt/6.7.3/mingw_64/mkspecs/win32-g++;C:/Qt/6.7.3/mingw_64/include;C:/Qt/6.7.3/mingw_64/include/QtWidgets;C:/Qt/6.7.3/mingw_64/include;C:/Qt/6.7.3/mingw_64/include/QtGui;C:/Qt/6.7.3/mingw_64/include")
+set(lupdate_subproject1_sources "E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/build/DeskPet_autogen/mocs_compilation.cpp;main.cpp;PetWindow.h;PetWindow.cpp;animationmanager.h;animationmanager.cpp;petcontroller.h;petcontroller.cpp;traymenumanager.h;traymenumanager.cpp;res.qrc;E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/build/.qt/rcc/qrc_DeskPet_translations.cpp;E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/build/DeskPet_autogen/timestamp;E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/build/DeskPet_autogen/EWIEGA46WW/qrc_res.cpp;E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/build/.qt/rcc/qrc_DeskPet_translations.cpp.rule;E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/build/DeskPet_autogen/timestamp.rule;E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/build/DeskPet_autogen/EWIEGA46WW/qrc_res.cpp.rule;E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/build/DeskPet_zh_CN.qm.rule")
+set(lupdate_subproject1_excluded "")
+set(lupdate_subproject1_autogen_dir "E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/build/DeskPet_autogen")

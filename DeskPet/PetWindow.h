@@ -23,6 +23,7 @@ protected:
 
 private slots:
     void onFrameUpdated();
+    void setWindowPosition(const QPoint &pos);
 
 private:
     PetController *m_controller;
