@@ -7,7 +7,16 @@
 	"CROSS_CONFIG" : false,
 	"GENERATOR" : "Ninja",
 	"INCLUDE_DIR" : "D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/DeskPet_autogen/include",
-	"INPUTS" : [ "D:/DeskPet/DeskPet/lion.png" ],
+	"INPUTS" : 
+	[
+		"D:/DeskPet/DeskPet/lion.png",
+		"D:/DeskPet/DeskPet/images/sleeping/sleeping_3.png",
+		"D:/DeskPet/DeskPet/images/sleeping/sleeping_1.png",
+		"D:/DeskPet/DeskPet/images/sleeping/sleeping_2.png",
+		"D:/DeskPet/DeskPet/images/idle/idle_3png.png",
+		"D:/DeskPet/DeskPet/images/idle/idle_1.png",
+		"D:/DeskPet/DeskPet/images/idle/idle_2.png"
+	],
 	"LOCK_FILE" : "D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/DeskPet_autogen.dir/AutoRcc_res_EWIEGA46WW_Lock.lock",
 	"MULTI_CONFIG" : false,
 	"OPTIONS" : [ "--no-zstd", "-name", "res" ],

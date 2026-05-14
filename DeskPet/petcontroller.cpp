@@ -3,12 +3,15 @@
 PetController::PetController(QObject *parent)
     : QObject{parent},m_currentState(PetState::IDLE),m_currentFrameIndex(0)
 {
-    m_animManager.loadLionSheet(":/lion.png");//在这个地方放入小狮子的图片资源,这个地方出了很长时间的错误，后来发现很有可能是因为使用cmake构建项目的时候需要显示的在camkelist之中添加
+    // Load per-state frames from resources (will fall back to sprite sheet if needed)
+    m_animManager.loadFromResources();
 
-        m_timer = new QTimer(this);
+    m_timer = new QTimer(this);
     connect(m_timer,&QTimer::timeout,this,&PetController::updateLogic);
 
-    m_timer->start(150);
+    // set initial interval based on current state
+    int initialInterval = m_animManager.getFrameInterval(m_currentState);
+    m_timer->start(initialInterval > 0 ? initialInterval : 150);
 }
 
 void PetController::changeState(PetState newState){
@@ -18,6 +21,10 @@ void PetController::changeState(PetState newState){
 
     m_currentState = newState;
     m_currentFrameIndex = 0;
+
+    // adjust timer interval for the new state's preferred frame duration
+    int interval = m_animManager.getFrameInterval(newState);
+    if(m_timer) m_timer->setInterval(interval > 0 ? interval : 150);
 
     emit frameUpdated();
 }

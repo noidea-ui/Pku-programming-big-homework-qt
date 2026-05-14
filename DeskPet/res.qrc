@@ -1,5 +1,11 @@
 <RCC>
     <qresource prefix="/">
+        <file>images/idle/idle_1.png</file>
+        <file>images/idle/idle_2.png</file>
+        <file>images/idle/idle_3png.png</file>
+        <file>images/sleeping/sleeping_1.png</file>
+        <file>images/sleeping/sleeping_2.png</file>
+        <file>images/sleeping/sleeping_3.png</file>
         <file>lion.png</file>
     </qresource>
 </RCC>
