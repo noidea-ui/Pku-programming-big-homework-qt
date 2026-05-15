@@ -1,9 +1,12 @@
 #include "petwindow.h"
 #include <QPainter>
+#include <QPixmap>
 #include <QApplication>
 #include <QGuiApplication>
 #include <QScreen>
 #include <QDebug>
+#include <QMenu>
+#include <QAction>
 
 PetWindow::PetWindow(QWidget *parent)
     : QWidget(parent),
@@ -64,14 +67,18 @@ void PetWindow::paintEvent(QPaintEvent *event)
         qDebug() << "Drawing image, size:" << currentFrame.size();
         painter.drawPixmap(rect(), currentFrame);
     } else {
-        // 【调试期占位符】：如果没有图片加载成功，画一个黄色的圆表示小狮子
-        qDebug() << "Image is null, drawing placeholder";
-        painter.setBrush(QColor(255, 200, 0, 200)); // 半透明的黄色
-        painter.setPen(Qt::NoPen);
-        painter.drawEllipse(rect());
+        static QPixmap s_lionPixmap(QStringLiteral(":/lion.png"));
+        if(!s_lionPixmap.isNull()){
+            painter.drawPixmap(rect(), s_lionPixmap);
+        } else {
+            // 回退到原来的黄色占位（仅在资源缺失时）
+            painter.setBrush(QColor(255, 200, 0, 200)); // 半透明的黄色
+            painter.setPen(Qt::NoPen);
+            painter.drawEllipse(rect());
 
-        painter.setPen(Qt::black); // 这里必须设置画笔颜色为黑色，否则文字画不出来
-        painter.drawText(rect(), Qt::AlignCenter, "载入\n素材中...");
+            painter.setPen(Qt::black); // 这里必须设置画笔颜色为黑色，否则文字画不出来
+            painter.drawText(rect(), Qt::AlignCenter, "载入\n素材中...");
+        }
     }
 }
 
@@ -121,6 +128,52 @@ void PetWindow::mouseDoubleClickEvent(QMouseEvent *event)
         // 示例：双击可以在这里改变状态，比如变成开心/举牌等
         // m_controller->changeState(PetState::CELEBRATING);
     }
+}
+
+void PetWindow::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+    QAction *defaultAct = menu.addAction("Default");
+    menu.addSeparator();
+
+    QAction *sleepAct = menu.addAction("SLEEPING");
+    QAction *workAct = menu.addAction("WORKING");
+    QAction *celebrateAct = menu.addAction("CELEBRATING");
+    QAction *sadAct = menu.addAction("SAD");
+
+    // 标记当前选择
+    defaultAct->setCheckable(true);
+    sleepAct->setCheckable(true);
+    workAct->setCheckable(true);
+    celebrateAct->setCheckable(true);
+    sadAct->setCheckable(true);
+
+    bool hasForced = m_controller->hasForcedState();
+    defaultAct->setChecked(!hasForced);
+    if (hasForced) {
+        PetState fs = m_controller->forcedState();
+        sleepAct->setChecked(fs == PetState::SLEEPING);
+        workAct->setChecked(fs == PetState::WORKING);
+        celebrateAct->setChecked(fs == PetState::CELEBRATING);
+        sadAct->setChecked(fs == PetState::SAD);
+    }
+
+    QAction *selected = menu.exec(event->globalPos());
+    if (!selected) return;
+
+    if (selected == defaultAct) {
+        m_controller->clearForcedState();
+    } else if (selected == sleepAct) {
+        m_controller->setForcedState(PetState::SLEEPING);
+    } else if (selected == workAct) {
+        m_controller->setForcedState(PetState::WORKING);
+    } else if (selected == celebrateAct) {
+        m_controller->setForcedState(PetState::CELEBRATING);
+    } else if (selected == sadAct) {
+        m_controller->setForcedState(PetState::SAD);
+    }
+
+    event->accept();
 }
 
 void PetWindow::onFrameUpdated()

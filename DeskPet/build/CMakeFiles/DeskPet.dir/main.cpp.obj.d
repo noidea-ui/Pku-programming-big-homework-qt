@@ -401,13 +401,14 @@ CMakeFiles/DeskPet.dir/main.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qbasictimer.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QPoint \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qpoint.h \
- E:\Games\GreatProject\Pku-programming-big-homework-qt\DeskPet\animationmanager.h \
  C:/Qt/6.7.3/mingw_64/include/QtGui/QPixmap \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qpixmap.h \
+ E:\Games\GreatProject\Pku-programming-big-homework-qt\DeskPet\animationmanager.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QMap \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qmap.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QList \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QRect \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QStringList \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qstringlist.h \
  E:\Games\GreatProject\Pku-programming-big-homework-qt\DeskPet\traymenumanager.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSystemTrayIcon \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qsystemtrayicon.h \
@@ -417,4 +418,6 @@ CMakeFiles/DeskPet.dir/main.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtGui/QAction \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qaction.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QApplication \
- C:/Qt/6.7.3/mingw_64/include/QtWidgets/qapplication.h
+ C:/Qt/6.7.3/mingw_64/include/QtWidgets/qapplication.h \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/QIcon \
+ C:/Qt/6.7.3/mingw_64/include/QtGui/qicon.h

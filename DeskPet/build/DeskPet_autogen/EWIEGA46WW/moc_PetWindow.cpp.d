@@ -7,6 +7,7 @@ E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/build/DeskPet_auto
   C:/Qt/6.7.3/mingw_64/include/QtCore/QRect \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QSize \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QSizeF \
+  C:/Qt/6.7.3/mingw_64/include/QtCore/QStringList \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QTimer \
   C:/Qt/6.7.3/mingw_64/include/QtCore/q20functional.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/q20memory.h \

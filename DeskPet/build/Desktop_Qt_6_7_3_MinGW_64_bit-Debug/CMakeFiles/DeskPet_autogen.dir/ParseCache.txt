@@ -12,7 +12,7 @@ D:/DeskPet/DeskPet/petcontroller.h
  mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/QList
  mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/QMap
  mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/QObject
- mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/QRect
+ mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/QStringList
  mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/QTimer
  mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/q20functional.h
  mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/q20memory.h
@@ -708,6 +708,7 @@ D:/DeskPet/DeskPet/PetWindow.h
  mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/QRect
  mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/QSize
  mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/QSizeF
+ mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/QStringList
  mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/QTimer
  mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/q20functional.h
  mdp:D:/Qt/6.7.3/mingw_64/include/QtCore/q20memory.h

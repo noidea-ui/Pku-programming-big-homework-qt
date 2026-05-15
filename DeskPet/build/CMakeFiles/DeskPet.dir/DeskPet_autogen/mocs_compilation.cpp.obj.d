@@ -402,13 +402,14 @@ CMakeFiles/DeskPet.dir/DeskPet_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qbasictimer.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QPoint \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qpoint.h \
- E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/animationmanager.h \
  C:/Qt/6.7.3/mingw_64/include/QtGui/QPixmap \
  C:/Qt/6.7.3/mingw_64/include/QtGui/qpixmap.h \
+ E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/animationmanager.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QMap \
  C:/Qt/6.7.3/mingw_64/include/QtCore/qmap.h \
  C:/Qt/6.7.3/mingw_64/include/QtCore/QList \
- C:/Qt/6.7.3/mingw_64/include/QtCore/QRect \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/QStringList \
+ C:/Qt/6.7.3/mingw_64/include/QtCore/qstringlist.h \
  E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/traymenumanager.h \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/QSystemTrayIcon \
  C:/Qt/6.7.3/mingw_64/include/QtWidgets/qsystemtrayicon.h \

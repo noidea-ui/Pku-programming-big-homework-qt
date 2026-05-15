@@ -2,9 +2,10 @@
 #define PETCONTROLLER_H
 
 #include <QObject>
-#include<QTimer>
+#include <QTimer>
 #include <QPoint>
-#include"animationmanager.h"
+#include <QPixmap>
+#include "animationmanager.h"
 class PetController : public QObject
 {
     Q_OBJECT
@@ -14,27 +15,42 @@ public:
     void changeState(PetState newState);
     PetState getCurrentState() const;
     QPixmap getCurrentFrame();
-    // 行走相关
-    QPoint m_targetPos;
-    bool m_isMoving{false};
-    double m_speed{4.0}; // 每次更新移动像素数（可调）
-    // 状态切换计时器
-    int m_stateTimerCounter{0}; // 每个状态的计时计数器
-    int m_walkStepCount{0};     // 行走距离计数（一次行走后切换）
 
-signals:
-    void positionChanged(const QPoint &pos);
+    // 强制动作接口：设定一个持续的动作（直到 clearForcedState 被调用）
+    void setForcedState(PetState state);
+    void clearForcedState();
+    bool hasForcedState() const;
+    PetState forcedState() const;
 
 signals:
     void frameUpdated();
+    void positionChanged(const QPoint &pos);
+
 private slots:
     void updateLogic();
+    void startRandomAction();
+
 private:
+    void chooseRandomTarget();
+
     PetState m_currentState;
     int m_currentFrameIndex;
+
     QTimer *m_timer;
+    QTimer *m_actionTimer;
+
+    bool m_isPlayingAction;
+    int m_sleepLoopsRemaining;
+    bool m_forcedActionActive;
+    PetState m_forcedState;
+
+    // 随机行走状态
+    QPoint m_targetPos;
+    bool m_isMoving{false};
+    double m_speed{4.0};
+
+    QPixmap m_lionPixmap;
     AnimationManager m_animManager;
-    
 
 };
 

@@ -56,6 +56,7 @@ DeskPet_autogen/timestamp: \
 	D:/Qt/6.7.3/mingw_64/include/QtCore/QRect \
 	D:/Qt/6.7.3/mingw_64/include/QtCore/QSize \
 	D:/Qt/6.7.3/mingw_64/include/QtCore/QSizeF \
+	D:/Qt/6.7.3/mingw_64/include/QtCore/QStringList \
 	D:/Qt/6.7.3/mingw_64/include/QtCore/QTimer \
 	D:/Qt/6.7.3/mingw_64/include/QtCore/q20functional.h \
 	D:/Qt/6.7.3/mingw_64/include/QtCore/q20memory.h \

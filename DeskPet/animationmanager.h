@@ -1,16 +1,19 @@
 #ifndef ANIMATIONMANAGER_H
 #define ANIMATIONMANAGER_H
 
-#include<QPixmap>
-#include<QMap>
-#include<QList>
-#include<QRect>
+#include <QPixmap>
+#include <QMap>
+#include <QList>
+#include <QStringList>
 
 enum class PetState{
     IDLE,
     DRAGGED,
     WALKING,
-    SLEEPING
+    SLEEPING,
+    WORKING,
+    CELEBRATING,
+    SAD
 };
 
 class AnimationManager
@@ -18,17 +21,25 @@ class AnimationManager
 public:
     AnimationManager();
 
-    //加载所有的素材
+    // 兼容旧的精灵表加载（保留以便回退）
     void loadLionSheet(const QString &filePath);
 
-    QPixmap getFrame(PetState state,int frameIndex);
+    // 从资源目录预加载按状态的图片帧
+    void loadFromResources();
+    void addAnimationFromResourceDir(PetState state, const QString &resourceDir, int intervalMs = 150);
+    void addAnimation(PetState state, const QStringList &resourcePaths, int intervalMs = 150);
+
+    QPixmap getFrame(PetState state,int frameIndex) const;
 
     int getFrameCount(PetState state) const;
+    int getFrameInterval(PetState state) const;
 
 private:
     void registerAnimations();
-    QPixmap m_lionSheet;
-    QMap<PetState,QList<QRect>>m_animationFrames;
+
+    QMap<PetState,QList<QPixmap>> m_animationPixmaps;
+    QMap<PetState,int> m_frameIntervalsMs;
+    QPixmap m_lionSheet; // fallback for backward compatibility
 };
 
 #endif // ANIMATIONMANAGER_H

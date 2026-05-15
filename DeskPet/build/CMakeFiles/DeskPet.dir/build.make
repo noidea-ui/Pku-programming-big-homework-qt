@@ -77,6 +77,12 @@ include CMakeFiles/DeskPet.dir/flags.make
 DeskPet_autogen/EWIEGA46WW/qrc_res.cpp: E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/res.qrc
 DeskPet_autogen/EWIEGA46WW/qrc_res.cpp: CMakeFiles/DeskPet_autogen.dir/AutoRcc_res_EWIEGA46WW_Info.json
 DeskPet_autogen/EWIEGA46WW/qrc_res.cpp: E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/lion.png
+DeskPet_autogen/EWIEGA46WW/qrc_res.cpp: E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/images/sleeping/sleeping_3.png
+DeskPet_autogen/EWIEGA46WW/qrc_res.cpp: E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/images/sleeping/sleeping_1.png
+DeskPet_autogen/EWIEGA46WW/qrc_res.cpp: E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/images/sleeping/sleeping_2.png
+DeskPet_autogen/EWIEGA46WW/qrc_res.cpp: E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/images/idle/idle_3png.png
+DeskPet_autogen/EWIEGA46WW/qrc_res.cpp: E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/images/idle/idle_1.png
+DeskPet_autogen/EWIEGA46WW/qrc_res.cpp: E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/images/idle/idle_2.png
 DeskPet_autogen/EWIEGA46WW/qrc_res.cpp: C:/Qt/6.7.3/mingw_64/bin/rcc.exe
 DeskPet_autogen/EWIEGA46WW/qrc_res.cpp: C:/Qt/6.7.3/mingw_64/bin/rcc.exe
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=E:\Games\GreatProject\Pku-programming-big-homework-qt\DeskPet\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Automatic RCC for res.qrc"

@@ -9,7 +9,13 @@
 	"INCLUDE_DIR" : "E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/build/DeskPet_autogen/include",
 	"INPUTS" : 
 	[
-		"E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/lion.png"
+		"E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/lion.png",
+		"E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/images/sleeping/sleeping_3.png",
+		"E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/images/sleeping/sleeping_1.png",
+		"E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/images/sleeping/sleeping_2.png",
+		"E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/images/idle/idle_3png.png",
+		"E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/images/idle/idle_1.png",
+		"E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/images/idle/idle_2.png"
 	],
 	"LOCK_FILE" : "E:/Games/GreatProject/Pku-programming-big-homework-qt/DeskPet/build/CMakeFiles/DeskPet_autogen.dir/AutoRcc_res_EWIEGA46WW_Lock.lock",
 	"MULTI_CONFIG" : false,

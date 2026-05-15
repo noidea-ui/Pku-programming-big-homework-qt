@@ -4,7 +4,7 @@ D:/DeskPet/DeskPet/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/DeskPet_autogen/EWI
   D:/Qt/6.7.3/mingw_64/include/QtCore/QList \
   D:/Qt/6.7.3/mingw_64/include/QtCore/QMap \
   D:/Qt/6.7.3/mingw_64/include/QtCore/QObject \
-  D:/Qt/6.7.3/mingw_64/include/QtCore/QRect \
+  D:/Qt/6.7.3/mingw_64/include/QtCore/QStringList \
   D:/Qt/6.7.3/mingw_64/include/QtCore/QTimer \
   D:/Qt/6.7.3/mingw_64/include/QtCore/q20functional.h \
   D:/Qt/6.7.3/mingw_64/include/QtCore/q20memory.h \

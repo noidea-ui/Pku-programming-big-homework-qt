@@ -5,63 +5,48 @@
 #include <QWidget>
 #include <QLineF>
 #include <QtMath>
-#include <QCoreApplication>
-#include <QFileInfo>
-#include <QDir>
 #include <QDebug>
-#include <QStringList>
+#include <QVector>
 
 PetController::PetController(QObject *parent)
-    : QObject{parent},m_currentState(PetState::IDLE),m_currentFrameIndex(0)
+    : QObject{parent},
+      m_currentState(PetState::IDLE),
+      m_currentFrameIndex(0),
+      m_timer(nullptr),
+      m_actionTimer(nullptr),
+      m_isPlayingAction(false),
+      m_sleepLoopsRemaining(0),
+      m_forcedActionActive(false),
+      m_forcedState(PetState::IDLE)
 {
-    // 尝试多个可能的路径加载 lion.png
-    QString appDir = QCoreApplication::applicationDirPath();
-    QStringList possiblePaths;
-    
-    // 路径1: build 的父目录（项目根）
-    possiblePaths << QDir(appDir).absoluteFilePath("../lion.png");
-    
-    // 路径2: build 同级目录
-    possiblePaths << QFileInfo(appDir).dir().absoluteFilePath("lion.png");
-    
-    // 路径3: 当前工作目录
-    possiblePaths << QDir::currentPath() + "/lion.png";
-    
-    // 路径4: 应用程序所在目录
-    possiblePaths << appDir + "/lion.png";
-    
-    QString loadedPath;
-    for(const QString &path : possiblePaths){
-        QFileInfo fi(path);
-        qDebug() << "Trying to load from:" << fi.absoluteFilePath() << "Exists:" << fi.exists();
-        if(fi.exists()){
-            m_animManager.loadLionSheet(fi.absoluteFilePath());
-            loadedPath = fi.absoluteFilePath();
-            qDebug() << "Successfully loaded from:" << loadedPath;
-            break;
-        }
-    }
-    
-    if(loadedPath.isEmpty()){
-        qWarning() << "Failed to load lion.png from any path!";
-        qWarning() << "App dir:" << appDir;
-        qWarning() << "Current dir:" << QDir::currentPath();
+    // Load per-state frames from resources (will fall back to sprite sheet if needed)
+    m_animManager.loadFromResources();
+
+    // load default lion pixmap from resources
+    if(!m_lionPixmap.load(":/lion.png")){
+        qWarning() << "Failed to load :/lion.png";
     }
 
     m_timer = new QTimer(this);
     connect(m_timer,&QTimer::timeout,this,&PetController::updateLogic);
 
-    m_timer->start(150); // 150ms 更新一次
+    // set initial interval based on current state
+    int initialInterval = m_animManager.getFrameInterval(m_currentState);
+    m_timer->start(initialInterval > 0 ? initialInterval : 150);
+
+    // action timer: every 5 seconds pick a random action to play
+    m_actionTimer = new QTimer(this);
+    connect(m_actionTimer, &QTimer::timeout, this, &PetController::startRandomAction);
+    m_actionTimer->start(5000);
 }
 
 void PetController::changeState(PetState newState){
-    if(m_currentState == newState){
+    if (m_currentState == newState) {
         return;
     }
 
     m_currentState = newState;
     m_currentFrameIndex = 0;
-    m_stateTimerCounter = 0;
 
     // 进入拖拽时停止移动
     if(m_currentState == PetState::DRAGGED){
@@ -71,8 +56,18 @@ void PetController::changeState(PetState newState){
     // 进入WALKING时重置移动状态
     if(m_currentState == PetState::WALKING){
         m_isMoving = false;
-        m_walkStepCount = 0;
     }
+
+    // 如果进入 SLEEPING，并且不是被强制锁定（forced），就设为 3 次循环；否则清零
+    if (newState == PetState::SLEEPING && !m_forcedActionActive) {
+        m_sleepLoopsRemaining = 3;
+    } else {
+        m_sleepLoopsRemaining = 0;
+    }
+
+    // adjust timer interval for the new state's preferred frame duration
+    int interval = m_animManager.getFrameInterval(newState);
+    if(m_timer) m_timer->setInterval(interval > 0 ? interval : 150);
 
     emit frameUpdated();
 }
@@ -82,116 +77,153 @@ PetState PetController::getCurrentState() const{
 }
 
 QPixmap PetController::getCurrentFrame() {
+    if(m_currentState == PetState::IDLE && !m_isPlayingAction){
+        if(!m_lionPixmap.isNull()) return m_lionPixmap;
+        // fallback to idle frames if lion resource missing
+        if(m_animManager.getFrameCount(PetState::IDLE) > 0)
+            return m_animManager.getFrame(PetState::IDLE, m_currentFrameIndex);
+        return QPixmap();
+    }
     return m_animManager.getFrame(m_currentState,m_currentFrameIndex);
 }
 
-// 随机选择一个非DRAGGED状态（IDLE、SLEEPING、WALKING等概率）
-PetState getRandomState(){
-    int choice = QRandomGenerator::global()->bounded(3);
-    if(choice == 0) return PetState::IDLE;
-    if(choice == 1) return PetState::WALKING;//It errors when switch to SLEEPING,so i temporarily deleted it
-    return PetState::WALKING;
-}
-
-// 随机选择目标点，避免靠近屏幕中心
-void chooseRandomTarget_internal(PetController *self){
+void PetController::chooseRandomTarget(){
     QScreen *screen = QGuiApplication::primaryScreen();
-    if(!screen) return;
-    QRect geo = screen->availableGeometry();
-
-    QWidget *w = qobject_cast<QWidget*>(self->parent());
-    QSize winSize = w ? w->size() : QSize(180,180);
-
-    // 可选区域为屏幕减去窗口尺寸
-    QRect allowed(geo.topLeft(), geo.size());
-    allowed.setRight(allowed.right() - winSize.width());
-    allowed.setBottom(allowed.bottom() - winSize.height());
-
-    QPoint center = geo.center();
-    double centerRadius = qMin(geo.width(), geo.height()) * 0.25; // 中心排除半径
-
-    // 多次尝试以找到符合条件的点
-    for(int i=0;i<30;i++){
-        int x = QRandomGenerator::global()->bounded(allowed.left(), allowed.right()+1);
-        int y = QRandomGenerator::global()->bounded(allowed.top(), allowed.bottom()+1);
-        QPoint cand(x,y);
-        QLineF line(cand, center);
-        if(line.length() >= centerRadius){
-            self->m_targetPos = cand;
-            self->m_isMoving = true;
-            return;
-        }
+    if(!screen){
+        m_isMoving = false;
+        return;
     }
 
-    // 如果没找到合适的点，就退而求其次随机选一个
-    int x = QRandomGenerator::global()->bounded(allowed.left(), allowed.right()+1);
-    int y = QRandomGenerator::global()->bounded(allowed.top(), allowed.bottom()+1);
-    self->m_targetPos = QPoint(x,y);
-    self->m_isMoving = true;
+    QRect geo = screen->availableGeometry();
+    QWidget *w = qobject_cast<QWidget*>(parent());
+    QSize winSize = w ? w->size() : QSize(180, 180);
+
+    // 防止窗口尺寸超过可用屏幕时产生非法随机区间
+    const int maxX = geo.right() - winSize.width();
+    const int maxY = geo.bottom() - winSize.height();
+
+    int left = geo.left();
+    int top = geo.top();
+    int right = qMax(left, maxX);
+    int bottom = qMax(top, maxY);
+
+    // QRandomGenerator::bounded(low, high) 的 high 是开区间，需要 +1
+    int x = QRandomGenerator::global()->bounded(left, right + 1);
+    int y = QRandomGenerator::global()->bounded(top, bottom + 1);
+
+    m_targetPos = QPoint(x, y);
+    m_isMoving = true;
 }
 
 void PetController::updateLogic(){
-    // 帧切换：每状态两帧间循环
     int frameCount = m_animManager.getFrameCount(m_currentState);
-    if(frameCount > 0){
-        m_currentFrameIndex = (m_currentFrameIndex + 1) % frameCount;
+    if (frameCount > 0) {
+        int nextIndex = (m_currentFrameIndex + 1) % frameCount;
+        m_currentFrameIndex = nextIndex;
+
+        // 如果当前状态是 SLEEPING，使用循环计数控制停留次数（每次回到第0帧计为一圈）
+        if (m_currentState == PetState::SLEEPING && m_currentFrameIndex == 0 && m_sleepLoopsRemaining > 0) {
+            --m_sleepLoopsRemaining;
+            if (m_sleepLoopsRemaining == 0) {
+                m_isPlayingAction = false;
+                changeState(PetState::IDLE);
+                if (m_actionTimer) m_actionTimer->start(5000);
+            }
+        }
+        // 其他一次性动作播放结束的判断（回到第0帧表示动作完成）
+        else if (m_isPlayingAction && m_currentFrameIndex == 0) {
+            m_isPlayingAction = false;
+            changeState(PetState::IDLE);
+            if (m_actionTimer) m_actionTimer->start(5000);
+        }
     }
 
-    // 行走状态逻辑：走一次（到达目标）后随机切换
-    if(m_currentState == PetState::WALKING){
+    // 保留随机行走逻辑
+    if (m_currentState == PetState::WALKING) {
         QWidget *w = qobject_cast<QWidget*>(parent());
-        if(!w){
+        if (!w) {
             emit frameUpdated();
             return;
         }
 
-        if(!m_isMoving){
-            // 选择新目标
-            chooseRandomTarget_internal(this);
+        if (!m_isMoving) {
+            chooseRandomTarget();
         }
 
-        if(m_isMoving){
+        if (m_isMoving) {
             QPoint cur = w->frameGeometry().topLeft();
             QLineF line(cur, m_targetPos);
             double dist = line.length();
-            if(dist <= m_speed || qFuzzyIsNull(dist)){
-                // 到达目标，随机切换到三个状态之一
+
+            if (dist <= m_speed || qFuzzyIsNull(dist)) {
                 emit positionChanged(m_targetPos);
                 m_isMoving = false;
-                PetState nextState = getRandomState();
-                changeState(nextState);
-                m_walkStepCount = 0;
+                m_isPlayingAction = false;
+                changeState(PetState::IDLE);
+                if (m_actionTimer) m_actionTimer->start(5000);
             } else {
                 double ratio = m_speed / dist;
                 double nx = cur.x() + (m_targetPos.x() - cur.x()) * ratio;
                 double ny = cur.y() + (m_targetPos.y() - cur.y()) * ratio;
-                QPoint newPos(qRound(nx), qRound(ny));
-                emit positionChanged(newPos);
+                emit positionChanged(QPoint(qRound(nx), qRound(ny)));
             }
         }
     }
-    // 空闲状态逻辑：每隔约10秒（约67次更新）随机切换到三个状态之一
-    else if(m_currentState == PetState::IDLE){
-        m_stateTimerCounter++;
-        const int TEN_SECONDS_UPDATES = 67; // 10000ms / 150ms ≈ 67
-        if(m_stateTimerCounter >= TEN_SECONDS_UPDATES){
-            m_stateTimerCounter = 0;
-            PetState nextState = getRandomState();
-            changeState(nextState);
-        }
-    }
-    // 睡觉状态逻辑：每隔约10秒随机切换到三个状态之一
-    else if(m_currentState == PetState::SLEEPING){
-        m_stateTimerCounter++;
-        const int TEN_SECONDS_UPDATES = 67; // 10000ms / 150ms ≈ 67
-        if(m_stateTimerCounter >= TEN_SECONDS_UPDATES){
-            m_stateTimerCounter = 0;
-            PetState nextState = getRandomState();
-            changeState(nextState);
-        }
-    }
-    // 拖拽状态：仅显示，无需额外逻辑
 
     emit frameUpdated();
 
+}
+
+void PetController::startRandomAction(){
+    if(m_isPlayingAction || m_forcedActionActive) return; // already playing or forced
+
+    // choose candidate action states (include IDLE, exclude DRAGGED)
+    QVector<PetState> candidates;
+    PetState choices[] = { PetState::IDLE, PetState::WALKING, PetState::SLEEPING, PetState::WORKING, PetState::CELEBRATING, PetState::SAD };
+    for(PetState s : choices){
+        if(s == PetState::WALKING || m_animManager.getFrameCount(s) > 0) candidates.append(s);
+    }
+    if(candidates.isEmpty()) return;
+
+    int idx = QRandomGenerator::global()->bounded(candidates.size());
+    PetState chosen = candidates.at(idx);
+
+    m_isPlayingAction = (chosen != PetState::WALKING);
+    if(m_actionTimer) m_actionTimer->stop();
+
+    // 如果随机选择的就是当前状态，需要手动重置帧索引并处理状态相关计数
+    if (chosen == m_currentState) {
+        m_currentFrameIndex = 0;
+        if (chosen == PetState::SLEEPING && !m_forcedActionActive) {
+            m_sleepLoopsRemaining = 3;
+        }
+        int interval = m_animManager.getFrameInterval(chosen);
+        if(m_timer) m_timer->setInterval(interval > 0 ? interval : 150);
+        emit frameUpdated();
+    } else {
+        changeState(chosen);
+    }
+}
+
+void PetController::setForcedState(PetState state){
+    m_forcedActionActive = true;
+    m_forcedState = state;
+    m_isPlayingAction = false;
+    if(m_actionTimer) m_actionTimer->stop();
+    changeState(state);
+}
+
+void PetController::clearForcedState(){
+    m_forcedActionActive = false;
+    m_forcedState = PetState::IDLE;
+    changeState(PetState::IDLE);
+    if(m_actionTimer) m_actionTimer->start(5000);
+}
+
+bool PetController::hasForcedState() const {
+    return m_forcedActionActive;
+}
+
+PetState PetController::forcedState() const {
+    return m_forcedState;
 }
