@@ -1,5 +1,6 @@
 #include "petwindow.h"
 #include <QPainter>
+#include <QPixmap>
 #include <QApplication>
 
 PetWindow::PetWindow(QWidget *parent)
@@ -42,13 +43,18 @@ void PetWindow::paintEvent(QPaintEvent *event)
         // 如果成功获取到了图片，就绘制图片
         painter.drawPixmap(rect(), currentFrame);
     } else {
-        // 【调试期占位符】：如果没有图片加载成功，画一个黄色的圆表示小狮子
-        painter.setBrush(QColor(255, 200, 0, 200)); // 半透明的黄色
-        painter.setPen(Qt::NoPen);
-        painter.drawEllipse(rect());
+        static QPixmap s_lionPixmap(QStringLiteral(":/lion.png"));
+        if(!s_lionPixmap.isNull()){
+            painter.drawPixmap(rect(), s_lionPixmap);
+        } else {
+            // 回退到原来的黄色占位（仅在资源缺失时）
+            painter.setBrush(QColor(255, 200, 0, 200)); // 半透明的黄色
+            painter.setPen(Qt::NoPen);
+            painter.drawEllipse(rect());
 
-        painter.setPen(Qt::black); // 这里必须设置画笔颜色为黑色，否则文字画不出来
-        painter.drawText(rect(), Qt::AlignCenter, "载入\n素材中...");
+            painter.setPen(Qt::black); // 这里必须设置画笔颜色为黑色，否则文字画不出来
+            painter.drawText(rect(), Qt::AlignCenter, "载入\n素材中...");
+        }
     }
 }
 
