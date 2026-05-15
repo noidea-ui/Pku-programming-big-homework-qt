@@ -12,6 +12,8 @@ public:
     explicit PetController(QObject *parent = nullptr);
 
     void changeState(PetState newState);
+    void startDrag();
+    void stopDrag();
     PetState getCurrentState() const;
     QPixmap getCurrentFrame();
     // 强制动作接口：设定一个持续的动作（直到 clearForcedState 被调用）
@@ -36,6 +38,13 @@ private:
     PetState m_forcedState;
     QPixmap m_lionPixmap;
     AnimationManager m_animManager;
+    // Drag snapshot state
+    bool m_inDrag;
+    PetState m_savedState;
+    int m_savedFrameIndex;
+    bool m_savedIsPlayingAction;
+    int m_savedSleepLoopsRemaining;
+    bool m_savedActionTimerRunning;
 
 };
 
