@@ -3,7 +3,15 @@
 #include <QDebug>
 
 PetController::PetController(QObject *parent)
-    : QObject{parent},m_currentState(PetState::IDLE),m_currentFrameIndex(0),m_actionTimer(nullptr),m_isPlayingAction(false),m_sleepLoopsRemaining(0)
+    : QObject{parent},
+      m_currentState(PetState::IDLE),
+      m_currentFrameIndex(0),
+      m_timer(nullptr),
+      m_actionTimer(nullptr),
+      m_isPlayingAction(false),
+      m_sleepLoopsRemaining(0),
+      m_forcedActionActive(false),
+      m_forcedState(PetState::IDLE)
 {
     // Load per-state frames from resources (will fall back to sprite sheet if needed)
     m_animManager.loadFromResources();
@@ -34,8 +42,8 @@ void PetController::changeState(PetState newState){
     m_currentState = newState;
     m_currentFrameIndex = 0;
 
-    // 如果进入 SLEEPING，就设为 3 次循环；否则清零
-    if (newState == PetState::SLEEPING) {
+    // 如果进入 SLEEPING，并且不是被强制锁定（forced），就设为 3 次循环；否则清零
+    if (newState == PetState::SLEEPING && !m_forcedActionActive) {
         m_sleepLoopsRemaining = 3;
     } else {
         m_sleepLoopsRemaining = 0;
@@ -90,11 +98,11 @@ void PetController::updateLogic(){
 }
 
 void PetController::startRandomAction(){
-    if(m_isPlayingAction) return; // already playing
+    if(m_isPlayingAction || m_forcedActionActive) return; // already playing or forced
 
-    // choose candidate action states (exclude IDLE and DRAGGED)
+    // choose candidate action states (include IDLE, exclude DRAGGED)
     QVector<PetState> candidates;
-    PetState choices[] = { PetState::SLEEPING, PetState::WORKING, PetState::CELEBRATING, PetState::SAD };
+    PetState choices[] = { PetState::IDLE, PetState::SLEEPING, PetState::WORKING, PetState::CELEBRATING, PetState::SAD };
     for(PetState s : choices){
         if(m_animManager.getFrameCount(s) > 0) candidates.append(s);
     }
@@ -105,5 +113,40 @@ void PetController::startRandomAction(){
 
     m_isPlayingAction = true;
     if(m_actionTimer) m_actionTimer->stop();
-    changeState(chosen);
+
+    // 如果随机选择的就是当前状态，需要手动重置帧索引并处理状态相关计数
+    if (chosen == m_currentState) {
+        m_currentFrameIndex = 0;
+        if (chosen == PetState::SLEEPING && !m_forcedActionActive) {
+            m_sleepLoopsRemaining = 3;
+        }
+        int interval = m_animManager.getFrameInterval(chosen);
+        if(m_timer) m_timer->setInterval(interval > 0 ? interval : 150);
+        emit frameUpdated();
+    } else {
+        changeState(chosen);
+    }
+}
+
+void PetController::setForcedState(PetState state){
+    m_forcedActionActive = true;
+    m_forcedState = state;
+    m_isPlayingAction = false;
+    if(m_actionTimer) m_actionTimer->stop();
+    changeState(state);
+}
+
+void PetController::clearForcedState(){
+    m_forcedActionActive = false;
+    m_forcedState = PetState::IDLE;
+    changeState(PetState::IDLE);
+    if(m_actionTimer) m_actionTimer->start(5000);
+}
+
+bool PetController::hasForcedState() const {
+    return m_forcedActionActive;
+}
+
+PetState PetController::forcedState() const {
+    return m_forcedState;
 }
