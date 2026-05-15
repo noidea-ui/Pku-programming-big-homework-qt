@@ -21,15 +21,9 @@ PetWindow::PetWindow(QWidget *parent)
     // 实例化控制器
     m_controller = new PetController(this);
     
-    // 获取加载的图片大小来设置窗口大小
-    QPixmap firstFrame = m_controller->getCurrentFrame();
-    if(!firstFrame.isNull()){
-        qDebug() << "Setting window size to image size:" << firstFrame.size();
-        resize(firstFrame.size());
-    } else {
-        qDebug() << "First frame is null, using default size 180x180";
-        resize(180, 180);
-    }
+    // 固定窗口大小为 180x180，展示图片
+    resize(180, 180);
+    qDebug() << "Window size fixed to 180x180";
     
     connect(m_controller, &PetController::frameUpdated, this, &PetWindow::onFrameUpdated);
     connect(m_controller, &PetController::positionChanged, this, &PetWindow::setWindowPosition);
