@@ -10,14 +10,20 @@
 
 PetController::PetController(QObject *parent)
     : QObject{parent},
-      m_currentState(PetState::IDLE),
-      m_currentFrameIndex(0),
-      m_timer(nullptr),
-      m_actionTimer(nullptr),
-      m_isPlayingAction(false),
-      m_sleepLoopsRemaining(0),
-      m_forcedActionActive(false),
-      m_forcedState(PetState::IDLE)
+    m_currentState(PetState::IDLE),
+    m_currentFrameIndex(0),
+    m_timer(nullptr),
+    m_actionTimer(nullptr),
+    m_isPlayingAction(false),
+    m_sleepLoopsRemaining(0),
+    m_forcedActionActive(false),
+    m_forcedState(PetState::IDLE),
+    m_inDrag(false),
+    m_savedState(PetState::IDLE),
+    m_savedFrameIndex(0),
+    m_savedIsPlayingAction(false),
+    m_savedSleepLoopsRemaining(0),
+    m_savedActionTimerRunning(false)
 {
     // Load per-state frames from resources (will fall back to sprite sheet if needed)
     m_animManager.loadFromResources();
@@ -226,4 +232,36 @@ bool PetController::hasForcedState() const {
 
 PetState PetController::forcedState() const {
     return m_forcedState;
+}
+
+void PetController::startDrag(){
+    if (m_inDrag) return;
+    m_inDrag = true;
+    m_savedState = m_currentState;
+    m_savedFrameIndex = m_currentFrameIndex;
+    m_savedIsPlayingAction = m_isPlayingAction;
+    m_savedSleepLoopsRemaining = m_sleepLoopsRemaining;
+    m_savedActionTimerRunning = (m_actionTimer && m_actionTimer->isActive());
+
+    if (m_actionTimer) m_actionTimer->stop();
+    m_isPlayingAction = false;
+
+    changeState(PetState::DRAGGED);
+}
+
+void PetController::stopDrag(){
+    if (!m_inDrag) return;
+    m_inDrag = false;
+
+    m_currentState = m_savedState;
+    m_currentFrameIndex = m_savedFrameIndex;
+    m_isPlayingAction = m_savedIsPlayingAction;
+    m_sleepLoopsRemaining = m_savedSleepLoopsRemaining;
+
+    int interval = m_animManager.getFrameInterval(m_currentState);
+    if(m_timer) m_timer->setInterval(interval > 0 ? interval : 150);
+
+    if(m_actionTimer && m_savedActionTimerRunning) m_actionTimer->start(5000);
+
+    emit frameUpdated();
 }

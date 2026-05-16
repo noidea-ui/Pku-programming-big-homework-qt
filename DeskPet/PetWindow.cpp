@@ -88,7 +88,7 @@ void PetWindow::mousePressEvent(QMouseEvent *event)
 #endif
 
         // 状态切换：通知控制器进入“被拖拽”状态
-        m_controller->changeState(PetState::DRAGGED);
+        m_controller->startDrag();
         event->accept();
     }
 }
@@ -110,8 +110,8 @@ void PetWindow::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         m_isDragging = false;
-        // 状态切换：松开鼠标后回到“待机”状态
-        m_controller->changeState(PetState::IDLE);
+        // 状态切换：松开鼠标后恢复拖拽前状态
+        m_controller->stopDrag();
         event->accept();
     }
 }

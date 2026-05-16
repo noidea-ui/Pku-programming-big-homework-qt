@@ -7,5 +7,7 @@
         <file>images/sleeping/sleeping_2.png</file>
         <file>images/sleeping/sleeping_3.png</file>
         <file>lion.png</file>
+        <file>images/dragged/dragged_1.png</file>
+        <file>images/dragged/dragged_2.png</file>
     </qresource>
 </RCC>
