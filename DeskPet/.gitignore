@@ -1,0 +1,10 @@
+# Ignore build artifacts and IDE files
+build/
+.vscode/
+*.exe
+*.o
+*.obj
+*.log
+# Qt creator and other generated files
+*.user
+*.user.*
