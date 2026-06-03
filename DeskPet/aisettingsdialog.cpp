@@ -30,8 +30,8 @@ AISettingsDialog::AISettingsDialog(QWidget *parent)
     m_apiKeyEdit->setPlaceholderText(QStringLiteral("输入 API-Key"));
     m_endpointEdit->setPlaceholderText(kDefaultEndpoint);
     m_endpointEdit->setText(kDefaultEndpoint);
-    m_modelEdit->setPlaceholderText(QStringLiteral("gpt-3.5-turbo"));
-    m_systemPromptEdit->setPlaceholderText(QStringLiteral("例如：你是一只活泼的小猫，喜欢用短句和颜文字。"));
+    m_modelEdit->setPlaceholderText(QStringLiteral("deepseek-v4-flash"));
+    m_systemPromptEdit->setPlaceholderText(QStringLiteral("你是一只北京大学信息科学技术学院的吉祥物——工程狮，喜欢用短句和颜文字。输出时不需要描述动作表情。"));
     m_systemPromptEdit->setMinimumHeight(120);
 
     m_temperatureSpinBox->setRange(0.0, 2.0);
