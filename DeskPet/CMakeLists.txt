@@ -5,7 +5,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets LinguistTools)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets Network LinguistTools)
 
 qt_standard_project_setup()
 
@@ -20,6 +20,9 @@ qt_add_executable(DeskPet
     animationmanager.h animationmanager.cpp
     petcontroller.h petcontroller.cpp
     traymenumanager.h traymenumanager.cpp
+    aichatmanager.h aichatmanager.cpp
+    aisettingsdialog.h aisettingsdialog.cpp
+    chatbubbledialog.h chatbubbledialog.cpp
     res.qrc
 
 )
@@ -33,6 +36,7 @@ target_link_libraries(DeskPet
     PRIVATE
         Qt::Core
         Qt::Widgets
+        Qt::Network
 )
 
 install(TARGETS DeskPet

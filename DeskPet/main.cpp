@@ -1,11 +1,14 @@
 #include "PetWindow.h"
 #include <QApplication>
 #include <QIcon>
+#include <QCoreApplication>
 
 int main(int argc, char *argv[]) {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
+	QCoreApplication::setOrganizationName("DeskPet");
+	QCoreApplication::setApplicationName("DeskPet");
 	QApplication a(argc, argv);
 	// 保持程序在窗口关闭/隐藏后仍驻留（由托盘控制退出）
 	a.setQuitOnLastWindowClosed(false);
