@@ -11,5 +11,8 @@
         <file>images/bubble.png</file>
         <file>images/dragged/dragged_1.png</file>
         <file>images/dragged/dragged_2.png</file>
+        <file>images/sad/sad_0.png</file>
+        <file>images/working/working_1.png</file>
+        <file>images/celebrating/celebrating_1.png</file>
     </qresource>
 </RCC>
