@@ -15,7 +15,7 @@
 #include "httplib.h"
 
 FileTransferServer::FileTransferServer(QObject *parent)
-    : QObject(nullptr) // 不能设 parent，否则 moveToThread 会失败
+    : QObject(nullptr)
 {
     Q_UNUSED(parent);
 
@@ -25,18 +25,18 @@ FileTransferServer::FileTransferServer(QObject *parent)
 
         setupRoutes();
 
-        // 先绑定端口（非阻塞），确认可用后再进入阻塞监听
+
         if (!m_svr->bind_to_port("::", m_port)) {
             emit errorOccurred(
                 QString("端口 %1 绑定失败，可能被占用或IPv6未启用").arg(m_port));
             return;
         }
 
-        // 绑定成功，立即标记运行状态，外部才能感知到服务器已启动
+
         m_running.storeRelaxed(1);
         emit serverStarted(m_port);
 
-        // 进入 accept 循环（阻塞直到 m_svr->stop() 被调用）
+
         m_svr->listen_after_bind();
     });
 
@@ -248,7 +248,6 @@ void FileTransferServer::setupRoutes()
     });
 }
 
-// ── Helpers ────────────────────────────────────────────────
 
 bool FileTransferServer::isTokenValid(const httplib::Request &req)
 {

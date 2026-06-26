@@ -29,7 +29,7 @@ void AnimationManager::loadLionSheet(const QString &filePath){
 void AnimationManager::addAnimationFromResourceDir(PetState state, const QString &resourceDir, int intervalMs){
     QDir dir(resourceDir);
     if(!dir.exists()){
-        // Try with trailing slash removed/added — but simply warn and return
+
         qWarning() << "Resource dir does not exist:" << resourceDir;
         return;
     }
@@ -73,9 +73,9 @@ void AnimationManager::addAnimation(PetState state, const QStringList &resourceP
 }
 
 void AnimationManager::loadFromResources(){
-    // Try loading common directories under :/images/<state>
+
     PetState states[] = { PetState::IDLE, PetState::DRAGGED, PetState::WALKING, PetState::SLEEPING, PetState::WORKING, PetState::CELEBRATING, PetState::SAD };
-    QMap<PetState,int> defaults; // default intervals (ms)
+    QMap<PetState,int> defaults;
     defaults.insert(PetState::IDLE, 200);
     defaults.insert(PetState::DRAGGED, 150);
     defaults.insert(PetState::WALKING, 120);
@@ -91,7 +91,7 @@ void AnimationManager::loadFromResources(){
 }
 
 void AnimationManager::registerAnimations(){
-    // Default behavior: attempt to load per-state images from resources
+
     loadFromResources();
 }
 

@@ -25,10 +25,10 @@ PetController::PetController(QObject *parent)
     m_savedSleepLoopsRemaining(0),
     m_savedActionTimerRunning(false)
 {
-    // Load per-state frames from resources (will fall back to sprite sheet if needed)
+
     m_animManager.loadFromResources();
 
-    // load default lion pixmap from resources
+
     if(!m_lionPixmap.load(":/lion.png")){
         qWarning() << "Failed to load :/lion.png";
     }
@@ -36,11 +36,11 @@ PetController::PetController(QObject *parent)
     m_timer = new QTimer(this);
     connect(m_timer,&QTimer::timeout,this,&PetController::updateLogic);
 
-    // set initial interval based on current state
+
     int initialInterval = m_animManager.getFrameInterval(m_currentState);
     m_timer->start(initialInterval > 0 ? initialInterval : 150);
 
-    // action timer: every 5 seconds pick a random action to play
+
     m_actionTimer = new QTimer(this);
     connect(m_actionTimer, &QTimer::timeout, this, &PetController::startRandomAction);
     m_actionTimer->start(5000);
@@ -71,7 +71,6 @@ void PetController::changeState(PetState newState){
         m_sleepLoopsRemaining = 0;
     }
 
-    // adjust timer interval for the new state's preferred frame duration
     int interval = m_animManager.getFrameInterval(newState);
     if(m_timer) m_timer->setInterval(interval > 0 ? interval : 150);
 
@@ -113,7 +112,7 @@ void PetController::chooseRandomTarget(){
     int right = qMax(left, maxX);
     int bottom = qMax(top, maxY);
 
-    // QRandomGenerator::bounded(low, high) 的 high 是开区间，需要 +1
+
     int x = QRandomGenerator::global()->bounded(left, right + 1);
     int y = QRandomGenerator::global()->bounded(top, bottom + 1);
 

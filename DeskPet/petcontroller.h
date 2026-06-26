@@ -18,7 +18,6 @@ public:
     PetState getCurrentState() const;
     QPixmap getCurrentFrame();
 
-    // 强制动作接口：设定一个持续的动作（直到 clearForcedState 被调用）
     void setForcedState(PetState state);
     void clearForcedState();
     bool hasForcedState() const;
@@ -46,14 +45,13 @@ private:
     bool m_forcedActionActive;
     PetState m_forcedState;
 
-    // 随机行走状态
     QPoint m_targetPos;
     bool m_isMoving{false};
     double m_speed{4.0};
 
     QPixmap m_lionPixmap;
     AnimationManager m_animManager;
-    // Drag snapshot state
+
     bool m_inDrag;
     PetState m_savedState;
     int m_savedFrameIndex;
