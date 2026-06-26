@@ -1,3 +1,8 @@
 build/
+build_check/
+build_check2/
 .qtc_clangd/
 .vscode/
+temp/
+.claude/
+README.md

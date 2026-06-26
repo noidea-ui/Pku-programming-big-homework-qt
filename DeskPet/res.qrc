@@ -11,5 +11,6 @@
         <file>images/bubble.png</file>
         <file>images/dragged/dragged_1.png</file>
         <file>images/dragged/dragged_2.png</file>
+        <file>html/file_browser.html</file>
     </qresource>
 </RCC>

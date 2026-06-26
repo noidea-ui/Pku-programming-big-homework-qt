@@ -2,7 +2,10 @@
 #define PETWINDOW_H
 
 #include <QContextMenuEvent>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QMouseEvent>
+#include <QStringList>
 #include <QWidget>
 
 #include "petcontroller.h"
@@ -10,6 +13,8 @@
 
 class AIChatManager;
 class AISettingsDialog;
+class FileTransferDialog;
+class FileTransferServer;
 
 class PetWindow : public QWidget
 {
@@ -25,6 +30,8 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void contextMenuEvent(QContextMenuEvent *event) override;
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
 
 private slots:
     void onFrameUpdated();
@@ -38,14 +45,20 @@ private slots:
     void onAiReplyReady(const QString &replyText);
     void onAiRequestFailed(const QString &message);
     void openChatInput();
+    void handleFileTransferCommand();
+    void uploadFilesForTransfer();
 
 private:
     void syncTrayStateSelection();
+    void stopFileTransfer();
 
     PetController *m_controller;
     TrayMenuManager *m_trayManager;
     AIChatManager *m_aiManager;
     AISettingsDialog *m_settingsDialog;
+    FileTransferServer *m_fileServer = nullptr;
+    FileTransferDialog *m_fileTransferDialog = nullptr;
+    QStringList m_uploadedFiles;
     QPoint m_dragPosition;
     QPoint m_pressGlobalPosition;
     bool m_isDragging;

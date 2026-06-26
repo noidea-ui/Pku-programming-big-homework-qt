@@ -3,15 +3,24 @@
 #include "aichatmanager.h"
 #include "aisettingsdialog.h"
 #include "chatbubbledialog.h"
+#include "FileTransferDialog.h"
+#include "FileTransferServer.h"
+#include "QRCodeGenerator.h"
 
 #include <QAction>
 #include <QApplication>
 #include <QDialog>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QMimeData>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPixmap>
 #include <QStyleHints>
+#include <QUuid>
+
+#include <algorithm>
 
 PetWindow::PetWindow(QWidget *parent)
     : QWidget(parent)
@@ -24,6 +33,7 @@ PetWindow::PetWindow(QWidget *parent)
 {
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
     setAttribute(Qt::WA_TranslucentBackground);
+    setAcceptDrops(true);
     resize(180, 180);
 
     m_controller = new PetController(this);
@@ -43,10 +53,22 @@ PetWindow::PetWindow(QWidget *parent)
 
     connect(m_aiManager, &AIChatManager::replyReady, this, &PetWindow::onAiReplyReady);
     connect(m_aiManager, &AIChatManager::requestFailed, this, &PetWindow::onAiRequestFailed);
+
+    m_fileServer = new FileTransferServer(); // 不设 parent（moveToThread 要求）
+    connect(m_fileServer, &FileTransferServer::errorOccurred, this, [this](const QString &msg) {
+        ChatBubbleDialog::showMessage(this, msg);
+    });
+    connect(m_fileServer, &FileTransferServer::fileDownloaded, this, [this](const QString &fileName) {
+        ChatBubbleDialog::showMessage(this,
+            QStringLiteral("文件 %1 已被下载到手机").arg(fileName));
+    });
 }
 
 PetWindow::~PetWindow()
 {
+    stopFileTransfer();
+    delete m_fileServer;
+    m_fileServer = nullptr;
 }
 
 void PetWindow::paintEvent(QPaintEvent *event)
@@ -144,9 +166,71 @@ void PetWindow::mouseDoubleClickEvent(QMouseEvent *event)
     }
 }
 
+void PetWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (event->mimeData()->hasUrls()) {
+        event->acceptProposedAction();
+    }
+}
+
+void PetWindow::dropEvent(QDropEvent *event)
+{
+    const QMimeData *mimeData = event->mimeData();
+    if (!mimeData->hasUrls())
+        return;
+
+    QStringList newPaths;
+    for (const QUrl &url : mimeData->urls()) {
+        if (!url.isLocalFile())
+            continue;
+        const QString path = url.toLocalFile();
+        if (!m_uploadedFiles.contains(path)) {
+            m_uploadedFiles.append(path);
+            newPaths.append(path);
+        }
+    }
+
+    if (newPaths.isEmpty())
+        return;
+
+    // 如果服务器正在运行，同步添加
+    if (m_fileServer && m_fileServer->isRunning()) {
+        m_fileServer->addFiles(newPaths);
+    }
+
+    QStringList newNames;
+    for (const QString &path : newPaths)
+        newNames.append(QFileInfo(path).fileName());
+
+    const int total = m_uploadedFiles.size();
+    QString msg;
+    if (newNames.size() == 1) {
+        msg = QStringLiteral("已添加「%1」，当前共 %2 个文件").arg(newNames.first()).arg(total);
+    } else {
+        msg = QStringLiteral("已添加 %1 个文件，当前共 %2 个文件").arg(newNames.size()).arg(total);
+    }
+
+    if (m_fileServer && m_fileServer->isRunning()) {
+        msg += QStringLiteral("。手机端刷新页面即可看到");
+    } else {
+        msg += QStringLiteral("。输入 /文件传输 开始共享");
+    }
+
+    ChatBubbleDialog::showMessage(this, msg);
+    event->acceptProposedAction();
+}
+
 void PetWindow::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
+
+    // 文件传输运行时显示上传按钮
+    QAction *uploadAct = nullptr;
+    if (m_fileServer && m_fileServer->isRunning()) {
+        uploadAct = menu.addAction(QStringLiteral("上传文件"));
+        menu.addSeparator();
+    }
+
     QAction *defaultAct = menu.addAction("Default");
     menu.addSeparator();
 
@@ -173,6 +257,11 @@ void PetWindow::contextMenuEvent(QContextMenuEvent *event)
 
     QAction *selected = menu.exec(event->globalPos());
     if (!selected) {
+        return;
+    }
+
+    if (uploadAct && selected == uploadAct) {
+        uploadFilesForTransfer();
         return;
     }
 
@@ -259,10 +348,11 @@ void PetWindow::openChatInput()
     const bool hadForcedState = m_controller->hasForcedState();
     const PetState previousForcedState = hadForcedState ? m_controller->forcedState() : PetState::IDLE;
 
-    // 输入期间强制保持待机，避免宠物移动导致气泡脱离。
     m_controller->setForcedState(PetState::IDLE);
 
-    const QString userText = ChatBubbleDialog::getText(this, QStringLiteral("AI 对话"), QStringLiteral("输入你想对宠物说的话"));
+    const QString userText = ChatBubbleDialog::getText(this,
+        QStringLiteral("AI 对话"),
+        QStringLiteral("输入你想对宠物说的话（/文件传输 启动文件共享）"));
 
     if (hadForcedState) {
         m_controller->setForcedState(previousForcedState);
@@ -274,7 +364,111 @@ void PetWindow::openChatInput()
         return;
     }
 
+    if (userText.trimmed().startsWith(QStringLiteral("/文件传输"))) {
+        handleFileTransferCommand();
+        return;
+    }
+
     m_aiManager->sendUserMessage(userText);
+}
+
+void PetWindow::handleFileTransferCommand()
+{
+    // 如果已经在运行，先停止
+    if (m_fileServer->isRunning() || m_fileTransferDialog) {
+        stopFileTransfer();
+    }
+
+    // 清理已经不存在的文件
+    const auto it = std::remove_if(m_uploadedFiles.begin(), m_uploadedFiles.end(),
+                                   [](const QString &path) { return !QFile::exists(path); });
+    m_uploadedFiles.erase(it, m_uploadedFiles.end());
+
+    const QString ipv6 = FileTransferServer::getStrictGlobalIPv6();
+    if (ipv6.isEmpty()) {
+        ChatBubbleDialog::showMessage(this,
+            QStringLiteral("未检测到公网IPv6，请检查网络连接。"));
+        return;
+    }
+
+    const QString token = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    const quint16 port = 8080;
+
+    if (!m_fileServer->start(port, m_uploadedFiles, token)) {
+        ChatBubbleDialog::showMessage(this,
+            QStringLiteral("文件共享服务启动失败，请稍后重试。"));
+        return;
+    }
+
+    const QString url = QString("http://[%1]:%2/?token=%3").arg(ipv6).arg(port).arg(token);
+    const QPixmap qr = QRCodeGenerator::generateQRCode(url, 300);
+
+    m_fileTransferDialog = new FileTransferDialog(qr, ipv6, port,
+                                                  m_uploadedFiles.size(), nullptr);
+    connect(m_fileTransferDialog, &FileTransferDialog::stopRequested,
+            this, &PetWindow::stopFileTransfer);
+
+    const QPoint petTopRight = frameGeometry().topRight();
+    m_fileTransferDialog->move(petTopRight + QPoint(10, 0));
+
+    m_fileTransferDialog->show();
+
+    const int count = m_uploadedFiles.size();
+    if (count == 0) {
+        ChatBubbleDialog::showMessage(this,
+            QStringLiteral("共享列表为空。右键宠物→上传文件 来添加文件。注意：手机需连接同一Wi-Fi。"));
+    } else {
+        ChatBubbleDialog::showMessage(this,
+            QStringLiteral("共享 %1 个文件，请用手机扫码下载。右键宠物可继续上传。").arg(count));
+    }
+}
+
+void PetWindow::uploadFilesForTransfer()
+{
+    const QStringList files = QFileDialog::getOpenFileNames(
+        this, QStringLiteral("选择要共享的文件"), QString(),
+        QStringLiteral("所有文件 (*)"));
+
+    if (files.isEmpty())
+        return;
+
+    QStringList newNames;
+    for (const QString &path : files) {
+        if (!m_uploadedFiles.contains(path)) {
+            m_uploadedFiles.append(path);
+            newNames.append(QFileInfo(path).fileName());
+        }
+    }
+
+    if (newNames.isEmpty())
+        return;
+
+    // 同步到正在运行的服务器（线程安全）
+    m_fileServer->addFiles(files);
+
+    const int total = m_uploadedFiles.size();
+    QString msg;
+    if (newNames.size() == 1) {
+        msg = QStringLiteral("已上传「%1」，当前共 %2 个文件。手机端刷新页面即可看到。")
+                  .arg(newNames.first()).arg(total);
+    } else {
+        msg = QStringLiteral("已上传 %1 个文件，当前共 %2 个文件。手机端刷新页面即可看到。")
+                  .arg(newNames.size()).arg(total);
+    }
+
+    ChatBubbleDialog::showMessage(this, msg);
+}
+
+void PetWindow::stopFileTransfer()
+{
+    if (m_fileServer) {
+        m_fileServer->stop();
+    }
+
+    if (m_fileTransferDialog) {
+        m_fileTransferDialog->close();
+        m_fileTransferDialog = nullptr;
+    }
 }
 
 void PetWindow::onFrameUpdated()
