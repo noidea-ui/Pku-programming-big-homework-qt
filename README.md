@@ -1,2 +1,2 @@
 # Pku-programming-big-homework-qt
-这个是对对队(甜菜的名字)的被打程设大作业
+https://disk.pku.edu.cn/anyshare/zh-cn/dir/EE5CA32F5E1E4CDE8AC6BEBDCCCEEA73/685415F7AD794D91B804D6DEABC7C544
